@@ -102,6 +102,7 @@ let sql = {
                 });
 
             }, function(err,results) {
+
                 if(err) rej(err);
                 //console.log(results);
                 tsql+=results.join(" UNION ");

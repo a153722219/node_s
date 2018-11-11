@@ -215,7 +215,7 @@ router.get('/add', function(req, res, next) {
                         if(task.execTime==0){
                             //立即执行
                             sqls.createdsql(result2[0]).then(sqlresult=>{
-                                //console.log(res);
+
                                 req.conn2.query(sqlresult,function (err,result) {
                                     if(err){
                                         //TODO 记录日志
@@ -233,7 +233,7 @@ router.get('/add', function(req, res, next) {
                         }else{
                             //获取SQL
                             sqls.createdsql(result2[0]).then(sqlresult=>{
-
+                                console.log(sqlresult);
                                 let cycle = task.cycle;
                                 let execTime = task.execTime;
                                 let r_c = sqls.getTimeStamp(cycle,execTime);
@@ -248,7 +248,7 @@ router.get('/add', function(req, res, next) {
                                         if(err){
                                             //TODO 记录日志
                                             tmpConn.end();
-                                            return res.status(500).json(reqs.success("sync task exec fail"));
+
                                         }else if(result){
                                             //TODO 记录日志
                                             tmpConn.end();
@@ -267,8 +267,7 @@ router.get('/add', function(req, res, next) {
                                                 tname:task.tname
                                             };
 
-                                            req.conn2.end();
-                                            return res.status(200).json(reqs.success("sync task add success"));
+
 
                                         }
                                     });
@@ -276,6 +275,23 @@ router.get('/add', function(req, res, next) {
                                     console.log("async task  "+task.id+' is running:' + new Date());
                                 });
 
+
+                                //添加到队列
+
+                                taskArr[task.id] = {
+                                    t:t,
+                                    taskId:task.id,
+                                    cycle:cycle,
+                                    execTime:execTime,
+                                    status:"running",
+                                    uuid:req.uuid,
+                                    type:task.type,
+                                    nodeId:nodeIds,
+                                    tname:task.tname
+                                };
+
+                                req.conn2.end();
+                                return res.status(200).json(reqs.success("sync task add success"));
                             });
 
 
